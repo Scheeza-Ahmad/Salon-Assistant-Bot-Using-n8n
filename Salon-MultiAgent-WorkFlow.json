@@ -42,7 +42,8 @@
     {
       "parameters": {
         "sessionIdType": "customKey",
-        "sessionKey": "={{ $json.body.sessionId }}"
+        "sessionKey": "={{ $json.body.sessionId }}",
+        "contextWindowLength": 10
       },
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.4,
@@ -240,8 +241,10 @@
         "operation": "download",
         "fileId": {
           "__rl": true,
-          "value": "={{ $json.id }}",
-          "mode": "id"
+          "value": "1Sbo7ljHg9xidB8JKyIL2Ql5KuWXHb3BD",
+          "mode": "list",
+          "cachedResultName": "Aura_Botanica_Salon-v2.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/1Sbo7ljHg9xidB8JKyIL2Ql5KuWXHb3BD/view?usp=drivesdk"
         },
         "options": {}
       },
@@ -495,8 +498,10 @@
         "operation": "download",
         "fileId": {
           "__rl": true,
-          "value": "={{ $json.id }}",
-          "mode": "id"
+          "value": "1XlszJxxIDsKJuQAYLBybIvypzl5PvCcd",
+          "mode": "list",
+          "cachedResultName": "Aura_Botanica_Deals_Discounts.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/1XlszJxxIDsKJuQAYLBybIvypzl5PvCcd/view?usp=drivesdk"
         },
         "options": {}
       },
@@ -860,7 +865,7 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1.1,
       "position": [
-        2128,
+        2112,
         -704
       ],
       "id": "f23d5999-a544-42fc-856f-0765eb60d239",
@@ -875,7 +880,8 @@
     {
       "parameters": {
         "sessionIdType": "customKey",
-        "sessionKey": "={{ $('Webhook').item.json.body.sessionId }}"
+        "sessionKey": "=={{ $('Webhook').first().json.body.sessionId }}",
+        "contextWindowLength": 8
       },
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.4,
@@ -891,7 +897,7 @@
         "promptType": "define",
         "text": "={{ JSON.parse($json.output).user_query }}",
         "options": {
-          "systemMessage": "You are the Appointment Specialist Agent for Aura & Botanica Salon.\n\nYour job is to help customers book, check availability for, reschedule, or cancel appointments.\n\nRULES:\n1. Always collect these details before booking: service name, preferred date, preferred time, customer name, phone number. If anything is missing, ask for it — do not assume.\n2. Always check calendar availability using the calendar tool BEFORE confirming any booking.\n3. If the requested slot is busy, suggest 2-3 nearby available time slots instead.\n4. Before finalizing, confirm all details with the customer in a summary and wait for their \"yes\" before creating the event.\n5. Only create the actual booking using the calendar tool after the customer confirms.\n6. For reschedule/cancel requests, ask for the phone number or existing booking details to identify the appointment, then confirm with the customer before making changes.\n7. Stay within salon business hours (Mon-Thu 10AM-8PM, Fri-Sat 11AM-9PM, Sun closed) — do not book outside these hours.\n8. Never invent availability — always verify through the tool.\n\nRESPONSE FORMAT:\nPlain text only. No markdown, asterisks, or headers.\n\nTONE:\nWarm, professional, efficient, and reassuring.\nWhen a booking is successfully created, after your friendly confirmation message to the customer, append this on a new line (this will not be shown to the customer, it's for internal system use):\nIMPORTANT - INTERNAL DATA:\nWhen a booking is successfully created, updated, or cancelled, after your friendly confirmation message to the customer, add a new line and include this exact format (this is for internal system use only, the customer will not see it):\n\nBOOKING_DATA: {\"name\": \"customer name\", \"phone\": \"phone number\", \"service\": \"service name\", \"date\": \"YYYY-MM-DD\", \"time\": \"HH:MM AM/PM\", \"status\": \"confirmed\"}\n\nIf no booking action was completed in this turn (e.g. you are still collecting information, checking availability, or just answering a question), do NOT include the BOOKING_DATA line at all.\nCONVERSATION STYLE:\nDo not ask for all booking details at once in a list. Instead, have a natural conversation and ask ONE question at a time, in this order:\n\n1. First ask: \"What service would you like to book?\"\n2. Once they answer, ask: \"What date would you prefer?\"\n3. Once they answer, ask: \"What time works best for you?\"\n4. Once they answer, ask: \"Could I get your full name?\"\n5. Once they answer, ask: \"And your phone number, please?\"\n\nOnly after collecting all 5 details, check calendar availability, then summarize everything and ask for final confirmation before booking.\n\nKeep each message short and conversational — do not repeat previously collected details unless confirming at the end.\nOUT OF SCOPE:\nDo not handle FAQs, complaints, deals, or general questions — those belong to other agents."
+          "systemMessage": "Today's date is {{ $now.format('EEEE, MMMM d, yyyy') }}. Always use this as the reference point when interpreting relative dates like \"tomorrow\", \"next Monday\", or when the customer gives a date without a year. Never assume a year on your own — always calculate it based on today's actual date.\nYou are the Appointment Specialist Agent for Aura & Botanica Salon.\n\nYour job is to help customers book, check availability for, reschedule, or cancel appointments.\n\nRULES:\n1. Always collect these details before booking: service name, preferred date, preferred time, customer name, phone number. If anything is missing, ask for it — do not assume.\n2. Always check calendar availability using the calendar tool BEFORE confirming any booking.\n3. If the requested slot is busy, suggest 2-3 nearby available time slots instead.\n4. Before finalizing, confirm all details with the customer in a summary and wait for their \"yes\" before creating the event.\n5. Only create the actual booking using the calendar tool after the customer confirms.\n6. For reschedule/cancel requests, ask for the phone number or existing booking details to identify the appointment, then confirm with the customer before making changes.\n7. Stay within salon business hours (Mon-Thu 10AM-8PM, Fri-Sat 11AM-9PM, Sun closed) — do not book outside these hours.\n8. Never invent availability — always verify through the tool.\n\nRESPONSE FORMAT:\nPlain text only. No markdown, asterisks, or headers.\n\nTONE:\nWarm, professional, efficient, and reassuring.\nWhen a booking is successfully created, after your friendly confirmation message to the customer, append this on a new line (this will not be shown to the customer, it's for internal system use):\nIMPORTANT - INTERNAL DATA:\nWhen a booking is successfully created, updated, or cancelled, after your friendly confirmation message to the customer, add a new line and include this exact format (this is for internal system use only, the customer will not see it):\n\nBOOKING_DATA: {\"name\": \"customer name\", \"phone\": \"phone number\", \"service\": \"service name\", \"date\": \"YYYY-MM-DD\", \"time\": \"HH:MM AM/PM\", \"status\": \"confirmed\"}\n\nIf no booking action was completed in this turn (e.g. you are still collecting information, checking availability, or just answering a question), do NOT include the BOOKING_DATA line at all.\nCONVERSATION STYLE:\nDo not ask for all booking details at once in a list. Instead, have a natural conversation and ask ONE question at a time, in this order:\n\n1. First ask: \"What service would you like to book?\"\n2. Once they answer, ask: \"What date would you prefer?\"\n3. Once they answer, ask: \"What time works best for you?\"\n4. Once they answer, ask: \"Could I get your full name?\"\n5. Once they answer, ask: \"And your phone number, please?\"\nIMPORTANT: Before asking any question, check the conversation history first. If the customer has already provided a piece of information (service, date, time, name, or phone), do NOT ask for it again — use what they already told you and move to the next missing detail.\nOnly after collecting all 5 details, check calendar availability, then summarize everything and ask for final confirmation before booking.\n\nKeep each message short and conversational — do not repeat previously collected details unless confirming at the end.\nOUT OF SCOPE:\nDo not handle FAQs, complaints, deals, or general questions — those belong to other agents."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -922,7 +928,7 @@
           "options": {
             "caseSensitive": true,
             "leftValue": "",
-            "typeValidation": "strict",
+            "typeValidation": "loose",
             "version": 3
           },
           "conditions": [
@@ -939,6 +945,7 @@
           ],
           "combinator": "and"
         },
+        "looseTypeValidation": true,
         "options": {}
       },
       "type": "n8n-nodes-base.if",
@@ -975,7 +982,7 @@
       "typeVersion": 1.5,
       "position": [
         2256,
-        1008
+        928
       ],
       "id": "8e2cda7c-89d1-4df2-bd70-4647ca0f6532",
       "name": "Human Response"
@@ -990,7 +997,7 @@
       "typeVersion": 1.5,
       "position": [
         2256,
-        816
+        688
       ],
       "id": "4ca0dfc9-f6fc-4041-9a5c-8a4626068990",
       "name": "Complaint Response"
@@ -1718,13 +1725,13 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "345a792d-072a-47ce-aeeb-d3a43fe77680",
+  "versionId": "bd98c1ba-8bda-4d80-9423-e24007703971",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "afcba1bbdb8b6a0eb7e86ced4f5a1d206adc62d6de0595ac57f2b38f65f52641"
